@@ -23,7 +23,7 @@ Note: please add your names and student numbers in all files you submit.
 	predicate ValidCheckpoint(int[] b) = b.length == Block.MAX_ID;
 @*/
 
-class SummaryBlock {
+class SummaryBlock implements Block{
 	/*@ predicate BlockInv(Block p, int hp, int h) =
 			this.previous |-> p
 		&*& this.hashPrevious |-> hp

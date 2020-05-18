@@ -1,3 +1,4 @@
+
 /*
 Construction and Verification of Software 2019/20.
 
@@ -7,8 +8,6 @@ Project assignment to implement and verify a simplified blockchain.
 
 Note: please add your names and student numbers in all files you submit.
 */
-
-
 
 /* There are auxiliary functions and lemmas to assist in the verification of the code below. */
 /*@
@@ -43,7 +42,7 @@ Note: please add your names and student numbers in all files you submit.
 @*/
 
 /* These are the predicates defining representation invariants for the blockchain blocks and transactions. */
-			
+
 /*@	
 	predicate isBlockchain(Blockchain b;) = b == null ? emp : b.head |-> ?l &*& isBlock(l,_);
  
@@ -71,35 +70,61 @@ Note: please add your names and student numbers in all files you submit.
 */
 
 interface Block {
-	//@ predicate BlockInv(Block p, int hp, int h); 
+	// @ predicate BlockInv(Block p, int hp, int h);
 
 	static final int MAX_ID = 100;
 
 	int balanceOf(int id);
-	//@ requires BlockInv(?p, ?hp, ?h) &*& ValidID(id) == true;
-	//@ ensures BlockInv(p, hp, h);
+	// @ requires BlockInv(?p, ?hp, ?h) &*& ValidID(id) == true;
+	// @ ensures BlockInv(p, hp, h);
 
 	Block getPrevious();
-	//@ requires BlockInv(?p, ?hp, ?h);
-	//@ ensures BlockInv(p, hp, h) &*& result == p;
+	// @ requires BlockInv(?p, ?hp, ?h);
+	// @ ensures BlockInv(p, hp, h) &*& result == p;
 
 	int getPreviousHash();
-	//@ requires BlockInv(?p, ?hp, ?h);
-	//@ ensures BlockInv(p, hp, h) &*& result == hp;
+	// @ requires BlockInv(?p, ?hp, ?h);
+	// @ ensures BlockInv(p, hp, h) &*& result == hp;
 
 	int hash();
-	//@ requires BlockInv(?p, ?hp, ?h);
-	//@ ensures BlockInv(p, hp, h) &*& result == h;
+	// @ requires BlockInv(?p, ?hp, ?h);
+	// @ ensures BlockInv(p, hp, h) &*& result == h;
 }
 
-/* 
-   This class should be implemented in the course of the project 
-   development with the expected operations to add and inspect the 
-   blocks 
-*/
+/*
+ * This class should be implemented in the course of the project development
+ * with the expected operations to add and inspect the blocks
+ */
 
 class Blockchain {
-	Block head;
-	
-	// Add methods and fields here.
+
+	Block head, previous;
+	int counter;
+
+	public Blockchain(int r, int[] balances) {
+		this.head = new SummaryBlock(null, r, balances);
+		this.previous = null;
+		counter = 0;
+	}
+
+	// add summary or simple
+	// for every tenth, adds summary block
+	public void addBlock(Block previous, int r, Transaction ts[], int[]balances) {
+		if (isValid(previous.hash())) {
+			this.previous = head;
+			if(counter % 10 == 0)
+				head = new  SummaryBlock(previous, r, balances);
+			else
+				head = new SimpleBlock(previous, r, ts);
+			
+			counter++;
+		}
+	}
+
+	private boolean isValid(int hash) {
+		if (hash % 100 == 0)
+			return true;
+		return false;
+	}
+
 }
