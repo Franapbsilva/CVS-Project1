@@ -98,27 +98,26 @@ interface Block {
 
 class Blockchain {
 
-	Block head, previous;
-	int counter;
+	private Block head;
+	
 
-	public Blockchain(int r, int[] balances) {
+	public Blockchain(int[] balances) {
+		int r = (int) Math.floor((Math.random()*10));
 		this.head = new SummaryBlock(null, r, balances);
-		this.previous = null;
-		counter = 0;
+		
 	}
 
 	// add summary or simple
 	// for every tenth, adds summary block
-	public void addBlock(Block previous, int r, Transaction ts[], int[]balances) {
-		if (isValid(previous.hash())) {
-			this.previous = head;
-			if(counter % 10 == 0)
-				head = new  SummaryBlock(previous, r, balances);
-			else
-				head = new SimpleBlock(previous, r, ts);
-			
-			counter++;
+	public boolean addBlock(Block b) {
+		boolean valid = isValid(b.hash());
+		if (valid) {
+			head = b;
 		}
+		return valid;
+	}
+	public Block getHead() {
+		return head;
 	}
 
 	private boolean isValid(int hash) {
