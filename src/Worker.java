@@ -43,16 +43,44 @@ public class Worker {
 		return transactions;
 	}
 
-	public void Work(Queue<Transaction> queue, int[] balances, Blockchain bChain) {
-		if(counter<10) {
+	public int[] Work(Queue<Transaction> queue, int[] balances, Blockchain bChain) {
+		if (counter < 10) {
 			Transaction[] ts = getTransactions(queue);
-			if(ts.length==0) return;
-			addSimpleBlock(ts,bChain);
-			counter++;
-		}else {
+			if (ts.length == 0)
+				return balances;
+			int[] temp = makeTransactions(balances, ts);
+			if (temp.length == balances.length) {
+				boolean valid = addSimpleBlock(ts, bChain);
+				if (valid) {
+					counter++;
+					return temp;
+				}
+			}
+			for (Transaction t :ts) {
+				queue.add(t);
+
+			}
+		} else {
 			addSummaryBlock(balances, bChain);
 			counter = 0;
 		}
+		return balances;
+	}
+
+	private int[] makeTransactions(int[] balances, Transaction[] ts) {
+		for (Transaction t : ts) {
+			int sender = t.getSender();
+			int receiver = t.getReceiver();
+			int amount = t.getAmount();
+			balances[sender] -= amount;
+			balances[receiver] += amount;
+		}
+
+		for (int b : balances) {
+			if (b < 0)
+				return new int[0];
+		}
+		return balances;
 	}
 
 }

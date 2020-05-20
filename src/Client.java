@@ -17,5 +17,6 @@ public class Client {
 	public void addTransactionToQueue(Transaction t, Queue<Transaction> queue) {
 		queue.add(t);
 	}
+
 	
 }
