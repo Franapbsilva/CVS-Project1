@@ -4,14 +4,17 @@ public class Worker {
 
 	private static final int TRANSACTIONS_AMOUNT = 5;
 	private int counter;
+	private int random;
 
 	public Worker() {
 		counter = 1;
+		random = 2;
+		
 	}
 
 	private boolean addSimpleBlock(Transaction ts[], Blockchain bChain) {
 		Block previous = bChain.getHead();
-		Block simple = new SimpleBlock(previous, 2, ts);
+		Block simple = new SimpleBlock(previous, random, ts);
 		boolean result = bChain.addBlock(simple);
 		return result;
 	}
@@ -44,6 +47,7 @@ public class Worker {
 	}
 
 	public int[] Work(Queue<Transaction> queue, int[] balances, Blockchain bChain) {
+		random++;
 		if (counter < 10) {
 			Transaction[] ts = getTransactions(queue);
 			if (ts.length == 0)

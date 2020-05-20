@@ -102,8 +102,7 @@ class Blockchain {
 	
 
 	public Blockchain(int[] balances) {
-		int r = (int) Math.floor((Math.random()*10));
-		this.head = new SummaryBlock(null, r, balances);
+		this.head = new SummaryBlock(null, 1, balances);
 		
 	}
 
