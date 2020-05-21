@@ -97,29 +97,52 @@ interface Block {
  */
 
 class Blockchain {
+	// @ predicate BlockchainInv(int[] b);
 
 	private Block head;
-	
 
 	public Blockchain(int[] balances) {
+		// @ requires true;
+		// @ ensures BlockchainInv(this);
 		this.head = new SummaryBlock(null, 1, balances);
-		
 	}
 
-	// add summary or simple
-	// for every tenth, adds summary block
+	/**
+	 * changes the head and return the validaty of the block.Valid = hash % 100 == 0
+	 * 
+	 * @param b
+	 * @return true || false
+	 */
 	public boolean addBlock(Block b) {
+		// @ requires true;
+
 		boolean valid = isValid(b.hash());
 		if (valid) {
 			head = b;
 		}
 		return valid;
 	}
+
+	/**
+	 * return the head of the blockchain
+	 * 
+	 * @return block
+	 */
 	public Block getHead() {
+		// @ requires BlockchainInv(this);
+		// @ ensures Block(result);
 		return head;
 	}
 
+	/**
+	 * a block is valid if its hash ends with two 00 - h % 100 = 0
+	 * 
+	 * @param hash
+	 * @return true || false
+	 */
 	private boolean isValid(int hash) {
+		// @ requires true;
+		// @ ensures BlockInv(p, hp, h) &*& result == h % 100;
 		if (hash % 100 == 0)
 			return true;
 		return false;
