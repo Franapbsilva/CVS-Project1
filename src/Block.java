@@ -48,6 +48,8 @@ Francisco Silva, nr 50654
 	predicate isBlockchain(Blockchain b;) = b == null ? emp : b.head |-> ?l &*& isBlock(l,_);
  
 	predicate isBlock(Block b;int h) = b == null ? h == 0 : b.BlockInv(_, _, h);
+	
+	
 
 	predicate TransHash(unit a, Transaction t; int hash) =
 		    t != null
@@ -106,7 +108,7 @@ class Blockchain {
 	private Block head;
 
 	public Blockchain(int[] balances) {
-		// @ requires array_slice_deep(s,0,balances.length,Positive,unit,?els,?vls)
+		// @ requires array_slice_deep(balances,0,balances.length,Positive,unit,?els,?vls)
 		// @ ensures BlockchainInv(_) &*& isBlock(this.head)
 		this.head = new SummaryBlock(null, 1, balances);
 	}
@@ -117,8 +119,8 @@ class Blockchain {
 	 * 
 	 */
 	public boolean addBlock(Block b) {
-		//@ requires BlockchainInv(?h) &*& b.isBlock() &*& b.previous == this.head;
-		//@ ensures BlockchainInv(h) &*& ;
+		//@ requires BlockchainInv(?h) &*& b.isBlock() &*& b.getPrevious() == this.head;
+		//@ ensures BlockchainInv(h);
 
 		boolean valid = isValid(b.hash());
 		if (valid) {
@@ -146,7 +148,7 @@ class Blockchain {
 	 */
 	private boolean isValid(int hash) {
 		//@ requires BlockchainInv(?h);
-		//@ ensures BlockchainInv(h) &*& result == ValidID(hash);
+		//@ ensures BlockchainInv(h);
 		if (hash % 100 == 0)
 			return true;
 		return false;

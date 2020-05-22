@@ -19,7 +19,7 @@ public class Worker {
 	}
 
 	private boolean addSimpleBlock(Transaction ts[], Blockchain bChain) {
-		//@requires counter == ?b &*& isBlockchain(bChain);
+		//@requires isBlockchain(bChain);
 		//@ensures true;
 		Block previous = bChain.getHead();
 		Block simple = new SimpleBlock(previous, random, ts);
@@ -28,7 +28,7 @@ public class Worker {
 	}
 
 	private boolean addSummaryBlock(int[] balances, Blockchain bChain) {
-		//@requires array_slice_deep(s,0,balances.length,Positive,unit,?els,?vls), isBlockchain(bChain);
+		//@requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*& isBlockchain(bChain);
 		//@ensures true;
 		Block previous = bChain.getHead();
 		Block sum = new SummaryBlock(previous, 2, balances);
@@ -38,19 +38,28 @@ public class Worker {
 
 	private Transaction[] getTransactions(Queue<Transaction> queue) {
 		//@requires true;
-		//@ensures result.length == 5;
+		//@ensures array_slice_deep(result,0,result.length,TransHash,unit,_,_);
 		Transaction[] transactions = new Transaction[TRANSACTIONS_AMOUNT];
 		int amount = 0;
 		for (int i = 0; i < TRANSACTIONS_AMOUNT; i++) {
+			//@ requires array_slice(transactions, 0, this.TRANSACTIONS_AMOUNT, ?vs)
+			//@invariant i < this.TRANSACTIONS_AMOUNT &*& i>=0;
+			
 			if (queue.size() != 0) {
 				transactions[i] = queue.remove();
 				amount++;
 			}
+			//@ length_drop(i,vls);
+			//@ take_one_more(vls,i);
+			
 
 		}
 		if (amount != TRANSACTIONS_AMOUNT) {
 			for (int i = 0; i < amount; i++) {
+				//@ requires array_slice(transactions, 0, amount, ?vs)
 				queue.add(transactions[i]);
+				//@ length_drop(i,vls);
+				//@ take_one_more(vls,i);
 
 			}
 			return new Transaction[0];
@@ -59,8 +68,8 @@ public class Worker {
 	}
 
 	public int[] Work(Queue<Transaction> queue, int[] balances, Blockchain bChain) {
-		//@requires array_slice_deep(s,0,balances.length,Positive,unit,?els,?vls) &*& isBlockchain(bChain);
-		//@ensures array_slice_deep(s,0,result.length,Positive,unit,?els,?vls);
+		//@requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*& isBlockchain(bChain);
+		//@ensures array_slice_deep(balances,0,result.length,Positive,unit,_,_);
 		random++;
 		if (counter < 10) {
 			Transaction[] ts = getTransactions(queue);
@@ -75,7 +84,9 @@ public class Worker {
 				}
 			}
 			for (Transaction t :ts) {
+			//@requires array_slice(ts, 0, ts.length, ?vs)
 				queue.add(t);
+			
 
 			}
 		} else {
@@ -86,7 +97,7 @@ public class Worker {
 	}
 
 	private int[] makeTransactions(int[] balances, Transaction[] ts) {
-		//@requires array_slice_deep(s,0,balances.length,Positive,unit,?els,?vls) && ts.length ==5;
+		//@requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*& ts.length ==5 &*& array_slice_deep(ts,0,ts.length,TransHash,unit,_,_);
 		//@ensures true;
 		for (Transaction t : ts) {
 			int sender = t.getSender();
@@ -97,6 +108,7 @@ public class Worker {
 		}
 
 		for (int b : balances) {
+			//@requires array_slice(balances, 0, balances.length, ?vs)
 			if (b < 0)
 				return new int[0];
 		}
