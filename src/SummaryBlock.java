@@ -5,7 +5,8 @@ Project assignment to implement and verify a simplified blockchain.
 
 
 
-Note: please add your names and student numbers in all files you submit.
+Frederico Lopes, nr 42764,
+Francisco Silva, nr 50654 
 */
 
 /* 

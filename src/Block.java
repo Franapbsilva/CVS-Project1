@@ -6,7 +6,8 @@ Project assignment to implement and verify a simplified blockchain.
 
 
 
-Note: please add your names and student numbers in all files you submit.
+Frederico Lopes, nr 42764,
+Francisco Silva, nr 50654 
 */
 
 /* There are auxiliary functions and lemmas to assist in the verification of the code below. */
@@ -53,6 +54,8 @@ Note: please add your names and student numbers in all files you submit.
 		&*& TransInv(t, ?s, ?r, ?v)
 		&*& hash == tansactionHash(s,r,v);
 		
+	predicate Positive(unit a, int v; unit n) = v>=0 &*& n == unit;
+		
 	fixpoint boolean ValidID(int id) {
 		return 0 <= id && id < Block.MAX_ID;
 	}
@@ -97,24 +100,25 @@ interface Block {
  */
 
 class Blockchain {
-	// @ predicate BlockchainInv(int[] b);
+	// @ predicate BlockchainInv(Block h) = this.head |->h;
+	
 
 	private Block head;
 
 	public Blockchain(int[] balances) {
-		// @ requires true;
-		// @ ensures BlockchainInv(this);
+		// @ requires array_slice_deep(s,0,balances.length,Positive,unit,?els,?vls)
+		// @ ensures BlockchainInv(_) &*& isBlock(this.head)
 		this.head = new SummaryBlock(null, 1, balances);
 	}
 
 	/**
-	 * changes the head and return the validaty of the block.Valid = hash % 100 == 0
+	 * changes the head and return the validity of the block.Valid = hash % 100 == 0
 	 * 
-	 * @param b
-	 * @return true || false
+	 * 
 	 */
 	public boolean addBlock(Block b) {
-		// @ requires true;
+		//@ requires BlockchainInv(?h) &*& b.isBlock() &*& b.previous == this.head;
+		//@ ensures BlockchainInv(h) &*& ;
 
 		boolean valid = isValid(b.hash());
 		if (valid) {
@@ -126,23 +130,23 @@ class Blockchain {
 	/**
 	 * return the head of the blockchain
 	 * 
-	 * @return block
+	 *
 	 */
 	public Block getHead() {
-		// @ requires BlockchainInv(this);
-		// @ ensures Block(result);
+		//@ requires BlockchainInv(?h);
+		//@ ensures BlockchainInv(h) &*& result == this.head;
+		
 		return head;
 	}
 
 	/**
 	 * a block is valid if its hash ends with two 00 - h % 100 = 0
 	 * 
-	 * @param hash
-	 * @return true || false
+	 * 
 	 */
 	private boolean isValid(int hash) {
-		// @ requires true;
-		// @ ensures BlockInv(p, hp, h) &*& result == h % 100;
+		//@ requires BlockchainInv(?h);
+		//@ ensures BlockchainInv(h) &*& result == ValidID(hash);
 		if (hash % 100 == 0)
 			return true;
 		return false;

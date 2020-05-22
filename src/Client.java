@@ -1,3 +1,6 @@
+/*Frederico Lopes, nr 42764,
+Francisco Silva, nr 50654 
+*/
 import java.util.LinkedList;
 import java.util.Queue;
 
