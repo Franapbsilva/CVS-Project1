@@ -59,7 +59,8 @@ public class Worker {
 	}
 
 	public int[] Work(Queue<Transaction> queue, int[] balances, Blockchain bChain) {
-		//@requires array_slice_deep(s,0,balances.length,Positive,unit,?els,?vls) &*& isBlockchain(bChain);
+		//@requires array_slice_deep(s,0,balances.length,Positive,unit,?els,?vls) &*& isBlockchain(bChain)
+		;
 		//@ensures array_slice_deep(s,0,result.length,Positive,unit,?els,?vls);
 		random++;
 		if (counter < 10) {
