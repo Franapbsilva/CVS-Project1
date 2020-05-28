@@ -7,10 +7,25 @@ public class Worker {
 	
 
 	private static final int TRANSACTIONS_AMOUNT = 5;
+	private Transaction[] ts;
+	private int[] balances;
+	private Blockchain bChain;
+	private int random;
+	private Thread t;
+	
+	
+	public Worker(Queue<Transaction> queue, int[] balances, Blockchain bChain, int random) {
+		this.ts = getTransactions(queue);
+		this.balances = balances;
+		this.bChain = bChain;
+		this.random = random;
+		t = new Thread(this::work);
+		t.start();
+	}
 
 	
 
-	private boolean addSimpleBlock(Transaction ts[], Blockchain bChain, int random) {
+	private boolean addSimpleBlock(Transaction ts[], Blockchain bChain) {
 		//@requires isBlockchain(bChain) &*& random>=0;
 		//@ensures true;
 		Block previous = bChain.getHead();
@@ -59,12 +74,11 @@ public class Worker {
 		return transactions;
 	}
 	
-/*
-	public int[] Work(Queue<Transaction> queue, int[] balances, Blockchain bChain) {
+
+	private void work() {
 		//@requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*& isBlockchain(bChain);
 		//@ensures array_slice_deep(balances,0,result.length,Positive,unit,_,_);
-		random++;
-		if (counter < 10) {
+/*		if (counter < 10) {
 			Transaction[] ts = getTransactions(queue);
 			if (ts.length == 0)
 				return balances;
@@ -84,11 +98,12 @@ public class Worker {
 			}
 		} else {
 			addSummaryBlock(balances, bChain);
-			counter = 0;
-		}
-		return balances;
+			
+			
+		}*/
+		
 	}
-	*/
+	
 
 	private void makeTransactions(int[] balances, Transaction[] ts) {
 		//@requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*& ts.length ==5 &*& array_slice_deep(ts,0,ts.length,TransHash,unit,_,_);
@@ -110,7 +125,6 @@ public class Worker {
 				return false;
 		}
 		return true;
-		
 	}
 
 }

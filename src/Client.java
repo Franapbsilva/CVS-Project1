@@ -29,11 +29,11 @@ public class Client {
 	}
 
 	public static void main(String[] args) {
-		BlockingQueue<Transaction> transactionQueue = new LinkedBlockingQueue<Transaction>();
+		Queue<Transaction> transactionQueue = new LinkedBlockingQueue<Transaction>();
 		int[] balances = generateNewBalances();
 		Blockchain bChain = new Blockchain(balances);
 		Scanner scan = new Scanner(System.in);
-		PoolOfWorkers worker = new PoolOfWorkers(WORKERS_AMOUNT);
+		PoolOfWorkers worker = new PoolOfWorkers(WORKERS_AMOUNT, transactionQueue, balances, bChain);
 		/*while (true) {
 			addTransactionToQueue(scan, transactionQueue);
 			balances = singleWorker.Work(transactionQueue, balances, bChain);

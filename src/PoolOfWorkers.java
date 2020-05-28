@@ -1,5 +1,6 @@
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -10,16 +11,18 @@ public class PoolOfWorkers {
 	private int random;
 	private List<Worker> workers;// verificar api
 	private Worker summaryWorker;
-	private Thread t;
 
-	public PoolOfWorkers(int workersAmount) {
+	public PoolOfWorkers(int workersAmount, Queue<Transaction> queue, int[] balances, Blockchain bChain) {
 		this.workers = new LinkedList<Worker>();
-		for(int i = 0; i>workersAmount;i++) {
-			workers.add(new Worker());
-		}
-		t = new Thread();
-		t.start();
 		counter =1;
 		random =2;
+		for(int i = 0; i>workersAmount;i++) {
+			workers.add(new Worker(queue, balances, bChain, random));
+			
+		}
+		
+		
 	}
+	
+	
 }
