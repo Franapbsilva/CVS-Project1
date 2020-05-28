@@ -2,10 +2,8 @@
 /*Frederico Lopes, nr 42764,
 Francisco Silva, nr 50654 
 */
-//import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Client {
@@ -28,16 +26,23 @@ public class Client {
 		queue.add(t);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	// @ requires true
+	// @ ensures true
+	{
+		
 		Queue<Transaction> transactionQueue = new LinkedBlockingQueue<Transaction>();
 		int[] balances = generateNewBalances();
 		Blockchain bChain = new Blockchain(balances);
 		Scanner scan = new Scanner(System.in);
 		PoolOfWorkers worker = new PoolOfWorkers(WORKERS_AMOUNT, transactionQueue, balances, bChain);
-		/*while (true) {
-			addTransactionToQueue(scan, transactionQueue);
-			balances = singleWorker.Work(transactionQueue, balances, bChain);
-		}*/
+		// completar
+		// @ assert PoolOfWorkersInv
+
+		/*
+		 * while (true) { addTransactionToQueue(scan, transactionQueue); balances =
+		 * singleWorker.Work(transactionQueue, balances, bChain); }
+		 */
 
 	}
 

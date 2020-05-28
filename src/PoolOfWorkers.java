@@ -18,7 +18,7 @@ public class PoolOfWorkers {
 		random =2;
 		for(int i = 0; i>workersAmount;i++) {
 			workers.add(new Worker(queue, balances, bChain, random));
-			
+			//@ assert WorkerInv(queue, balances, bChain, random);
 		}
 		
 		
