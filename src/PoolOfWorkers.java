@@ -7,22 +7,23 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class PoolOfWorkers {
 
 	// lista de workers
-	private int counter;
-	private int random;
+	private int[] counter;
+	
 	private List<Worker> workers;// verificar api
 	private Worker summaryWorker;
 
 	public PoolOfWorkers(int workersAmount, Queue<Transaction> queue, int[] balances, Blockchain bChain) {
 		this.workers = new LinkedList<Worker>();
-		counter =1;
-		random =2;
+		
+		counter = new int[1];
+		counter[0] = 1;
 		for(int i = 0; i>workersAmount;i++) {
-			workers.add(new Worker(queue, balances, bChain, random));
+			workers.add(new Worker(queue, balances, bChain, counter));
 			
 		}
-		
-		
+		summaryWorker = (new Worker(balances, bChain, counter));
 	}
+	
 	
 	
 }

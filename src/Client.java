@@ -34,10 +34,9 @@ public class Client {
 		Blockchain bChain = new Blockchain(balances);
 		Scanner scan = new Scanner(System.in);
 		PoolOfWorkers worker = new PoolOfWorkers(WORKERS_AMOUNT, transactionQueue, balances, bChain);
-		/*while (true) {
+		while(true) {
 			addTransactionToQueue(scan, transactionQueue);
-			balances = singleWorker.Work(transactionQueue, balances, bChain);
-		}*/
+		}
 
 	}
 
