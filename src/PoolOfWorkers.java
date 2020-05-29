@@ -19,7 +19,7 @@ public class PoolOfWorkers {
 		counter[0] = 1;
 		for(int i = 0; i<workersAmount;i++) {
 			workers.add(new Worker(queue, balances, bChain, counter));
-			System.out.println("worker created "+ i);
+			
 			//@ assert WorkerInv(queue, balances, bChain, counter);
 		}
 		summaryWorker = (new Worker(balances, bChain, counter));
