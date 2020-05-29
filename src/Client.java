@@ -23,6 +23,7 @@ public class Client {
 		int receiver = s.nextInt();
 		int amount = s.nextInt();
 		Transaction t = new Transaction(sender, receiver, amount);
+		System.out.println("added");
 		queue.add(t);
 	}
 
@@ -39,6 +40,7 @@ public class Client {
 		// @ assert PoolOfWorkersInv
 		while(true) {
 			addTransactionToQueue(scan, transactionQueue);
+			
 		}
 
 		
