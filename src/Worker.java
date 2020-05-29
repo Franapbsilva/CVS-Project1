@@ -17,27 +17,19 @@ public class Worker {
 	private boolean summary;
 	ReentrantLock mon;
 
-	public Worker(Queue<Transaction> queue, int[] balances, Blockchain bChain, int[] random) {
-		
+	public Worker(Queue<Transaction> queue, int[] balances, Blockchain bChain, int[] random, boolean isSummary) {
+
 		this.queue = queue;
 		this.balances = balances;
 		this.bChain = bChain;
 		this.random = random;
-		summary = false;
+		summary = isSummary;
 		t = new Thread(this::work);
 		t.start();
 		mon = new ReentrantLock();
 	}
 
-	public Worker(int[] balances, Blockchain bChain, int[] random) {
-		this.balances = balances;
-		this.bChain = bChain;
-		this.random = random;
-		summary = true;
-		t = new Thread(this::work);
-		t.start();
-		mon = new ReentrantLock();
-	}
+	
 
 	private boolean addSimpleBlock(Transaction ts[], Blockchain bChain) 
 	/*@ requires isBlockchain(bChain) &*& random>=0
@@ -103,46 +95,49 @@ public class Worker {
 	{
 
 		while (true) {
-			
 
 			//@ request permission to the shared state
 			mon.lock();
 			if (summary) {
-				while (random[0] % 10 != 0) {
+				while (random[0] % 10 == 0) {
 
 				}
 				addSummaryBlock(balances, bChain);
 				random[0]++;
+
 			} else {
-				while (random[0] % 10 == 0) {
-					if (queue.isEmpty()) {
+				while (random[0] % 10 != 0) {
 
-						Transaction[] ts = getTransactions(queue);
-						boolean result = addSimpleBlock(ts, bChain);
-						if (result) {
-							int[] temp = new int[balances.length];
-							for (int i = 0; i < balances.length; i++) {
-								temp[i] = balances[i];
-							}
-							makeTransactions(temp, ts);
-							if (isBalanceValid(temp)) {
-								makeTransactions(balances, ts);
-								random[0]++;
+				}
+				if (!queue.isEmpty()) {
+					
 
-							}
-							for (Transaction t : ts) {
-								//@ requires array_slice(ts, 0, ts.length, ?vs)
-								queue.add(t);
-							}
+					Transaction[] ts = getTransactions(queue);
+					boolean result = addSimpleBlock(ts, bChain);
+					if (result) {
+						int[] temp = new int[balances.length];
+						for (int i = 0; i < balances.length; i++) {
+							temp[i] = balances[i];
+						}
+						makeTransactions(temp, ts);
+						if (isBalanceValid(temp)) {
+							makeTransactions(balances, ts);
+							random[0]++;
 
 						}
 						for (Transaction t : ts) {
 							//@ requires array_slice(ts, 0, ts.length, ?vs)
 							queue.add(t);
-
 						}
+
+					}
+					for (Transaction t : ts) {
+						// @requires array_slice(ts, 0, ts.length, ?vs)
+						queue.add(t);
+
 					}
 				}
+
 			}
 			mon.unlock();
 			//@ release ownership of the shared state
