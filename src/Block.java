@@ -102,15 +102,17 @@ interface Block {
  */
 
 class Blockchain {
-	/*@ predicate BlockchainInv(Blockchain b; int[] a) = b.balances |->a 
-	 &*& a != null &*& array_slice(a, 0, a.length, ?elems);
-	 */
+	/*@ predicate BlockchainInv(Blockchain b;Block h) = b.head |-> h
+	 	&*& isBlock(h,_);
+	 @*/
 
 	private Block head;
 
-	//@ ensures BlockchainInv(_) &*& isBlock(this.head)
-	//@ requires array_slice_deep(balances,0,balances.length,Positive,unit,?els,?vls)
-	public Blockchain(int[] balances) {
+	
+	public Blockchain(int[] balances) 
+	//@ requires BlockchainInv(this) &*& isBlock(this.h,0);
+	//@ ensures array_slice_deep(balances,0,balances.length,Positive,unit,?els,?vls);
+	{
 		this.head = new SummaryBlock(null, 0, balances);
 	}
 
@@ -120,8 +122,8 @@ class Blockchain {
 	 * 
 	 */
 	public boolean addBlock(Block b)
-	//@ requires BlockchainInv(?h) &*& b.isBlock() &*& b.getPrevious() == this.head;
-	//@ ensures BlockchainInv(h);
+	//@ requires BlockchainInv(this) &*& b.isBlock(this.h,_) &*& b.getPrevious() == this.h;
+	//@ ensures BlockchainInv(this);
 	{
 		boolean valid = isValid(b.hash());
 		if (valid) {
@@ -136,8 +138,8 @@ class Blockchain {
 	 *
 	 */
 	public Block getHead()
-	//@ requires BlockchainInv(?h);
-	//@ ensures BlockchainInv(h) &*& result == this.head;
+	//@ requires BlockchainInv(this);
+	//@ ensures BlockchainInv(this) &*& result == this.h;
 	{
 		return head;
 	}
@@ -148,8 +150,8 @@ class Blockchain {
 	 * 
 	 */
 	private boolean isValid(int hash)
-	//@ requires BlockchainInv(?h);
-	//@ ensures BlockchainInv(h);
+	//@ requires BlockchainInv(this);
+	//@ ensures BlockchainInv(this);
 	{
 		if (hash % 100 == 0)
 			return true;
