@@ -3,6 +3,8 @@
 Francisco Silva, nr 50654 
 */
 import java.util.Queue;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.*;
 
 public class Worker {
 
@@ -13,7 +15,7 @@ public class Worker {
 	private int[] random;
 	private Thread t;
 	private boolean summary;
-
+	ReentrantLock mon;
 	public Worker(Queue<Transaction> queue, int[] balances, Blockchain bChain, int[] random) {
 		this.queue = queue;
 		this.balances = balances;
@@ -30,30 +32,45 @@ public class Worker {
 		summary = true;
 		t = new Thread(this::work);
 		t.start();
+		mon = new ReentrantLock();
 	}
 
-	private boolean addSimpleBlock(Transaction ts[], Blockchain bChain) {
-		// @requires isBlockchain(bChain) &*& random>=0 &*& summary = false;
-		// @ensures true;
+	private boolean addSimpleBlock(Transaction ts[], Blockchain bChain) //@ requires isBlockchain(bChain) &*& random>=0;
+	//@ ensures true;
+	{
+		//@ request permission to the shared state
+		mon.lock();
 		Block previous = bChain.getHead();
 		Block simple = new SimpleBlock(previous, random[0], ts);
 		boolean result = bChain.addBlock(simple);
+		mon.unlock();
+		//@ release ownership of the shared state
 		return result;
 	}
 
-	private boolean addSummaryBlock(int[] balances, Blockchain bChain) {
-		// @requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*&
-		// isBlockchain(bChain) &*& summary = true;
-		// @ensures true;
+	private boolean addSummaryBlock(int[] balances, Blockchain bChain) 
+	/*@ requires isBlockchain(bChain) &*& random>=0 
+	  &*& @requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) 
+	  &*& isBlockchain(bChain);
+	*/
+	//@ ensures true;
+	{
+		mon.lock();
+		//@ request permission to the shared state
 		Block previous = bChain.getHead();
 		Block sum = new SummaryBlock(previous, random[0], balances);
 		boolean result = bChain.addBlock(sum);
+		mon.unlock();
+		//@ release ownership of the shared state
 		return result;
 	}
 
-	private Transaction[] getTransactions(Queue<Transaction> queue) {
-		// @requires true;
-		// @ensures array_slice_deep(result,0,result.length,TransHash,unit,_,_);
+	private Transaction[] getTransactions(Queue<Transaction> queue) 
+	//@ requires true;
+	//@ ensures array_slice_deep(result,0,result.length,TransHash,unit,_,_);
+	{
+		//@ request permission to the shared state
+		mon.lock();
 		Transaction[] transactions = new Transaction[TRANSACTIONS_AMOUNT];
 		int amount = 0;
 		while(amount<TRANSACTIONS_AMOUNT) {
@@ -68,14 +85,18 @@ public class Worker {
 			// @ take_one_more(vls,i);
 
 		}
-		
+		}
+		mon.unlock();
+		//@ release ownership of the shared state
 		return transactions;
 	}
 
-	private void work() {
-		// @requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*&
-		// isBlockchain(bChain);
-		// @ensures array_slice_deep(balances,0,result.length,Positive,unit,_,_);
+	private void work() 
+	//@ requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*& isBlockchain(bChain);
+	//@ ensures array_slice_deep(balances,0,result.length,Positive,unit,_,_);
+	{
+		//@ request permission to the shared state
+		mon.lock();
 		while (true) {
 			if (queue.isEmpty()) {
 				if (summary) {
@@ -114,14 +135,16 @@ public class Worker {
 				}
 			}
 		}
-
+		mon.unlock();
+		//@ release ownership of the shared state
 	}
 
 	private void makeTransactions(int[] array, Transaction[] ts) {
-		// @requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*&
-		// ts.length ==5 &*& array_slice_deep(ts,0,ts.length,TransHash,unit,_,_);
-		// @ensures true;
-
+	// @requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*& ts.length ==5 &*& array_slice_deep(ts,0,ts.length,TransHash,unit,_,_);
+	// @ensures true;
+	{
+		//@ request permission to the shared state
+		mon.lock();
 		for (Transaction t : ts) {
 			int sender = t.getSender();
 			int receiver = t.getReceiver();
@@ -129,15 +152,21 @@ public class Worker {
 			array[sender] -= amount;
 			array[receiver] += amount;
 		}
-
+		mon.unlock();
+		//@ release ownership of the shared state
 	}
 
-	private boolean isBalanceValid(int[] balances) {
+	private boolean isBalanceValid(int[] balances) 
+	{
+		//@ request permission to the shared state
+		mon.lock();
 		for (int b : balances) {
 			// @requires array_slice(balances, 0, balances.length, ?vs)
 			if (b < 0)
 				return false;
 		}
+		mon.unlock();
+		//@ release ownership of the shared state
 		return true;
 	}
 
