@@ -35,7 +35,7 @@ public class Worker {
 		mon = new ReentrantLock();
 	}
 
-	private boolean addSimpleBlock(Transaction ts[], Blockchain bChain) //@ requires isBlockchain(bChain) &*& random>=0;
+	private boolean addSimpleBlock(Transaction ts[], Blockchain bChain) //@ requires isBlockchain(bChain) &*& random>=0 &*& summary==false;
 	//@ ensures true;
 	{
 		//@ request permission to the shared state
@@ -50,8 +50,8 @@ public class Worker {
 
 	private boolean addSummaryBlock(int[] balances, Blockchain bChain) 
 	/*@ requires isBlockchain(bChain) &*& random>=0 
-	  &*& @requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) 
-	  &*& isBlockchain(bChain);
+	  &*& array_slice_deep(balances,0,balances.length,Positive,unit,_,_) 
+	  &*& isBlockchain(bChain) &*& summary==true;
 	*/
 	//@ ensures true;
 	{
@@ -84,7 +84,7 @@ public class Worker {
 			// @ length_drop(i,vls);
 			// @ take_one_more(vls,i);
 
-		}
+		
 		}
 		mon.unlock();
 		//@ release ownership of the shared state
@@ -95,10 +95,12 @@ public class Worker {
 	//@ requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*& isBlockchain(bChain);
 	//@ ensures array_slice_deep(balances,0,result.length,Positive,unit,_,_);
 	{
-		//@ request permission to the shared state
-		mon.lock();
+		
 		while (true) {
+			
 			if (queue.isEmpty()) {
+				//@ request permission to the shared state
+				mon.lock();
 				if (summary) {
 					while (random[0] % 10 != 0) {
 
@@ -133,13 +135,14 @@ public class Worker {
 						queue.add(t);
 					}
 				}
+				mon.unlock();
+				//@ release ownership of the shared state
 			}
 		}
-		mon.unlock();
-		//@ release ownership of the shared state
+		
 	}
 
-	private void makeTransactions(int[] array, Transaction[] ts) {
+	private void makeTransactions(int[] array, Transaction[] ts) 
 	// @requires array_slice_deep(balances,0,balances.length,Positive,unit,_,_) &*& ts.length ==5 &*& array_slice_deep(ts,0,ts.length,TransHash,unit,_,_);
 	// @ensures true;
 	{

@@ -41,10 +41,7 @@ public class Client {
 			addTransactionToQueue(scan, transactionQueue);
 		}
 
-		/*
-		 * while (true) { addTransactionToQueue(scan, transactionQueue); balances =
-		 * singleWorker.Work(transactionQueue, balances, bChain); }
-		 */
+		
 
 	}
 
