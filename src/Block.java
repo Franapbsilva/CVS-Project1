@@ -110,7 +110,7 @@ class Blockchain {
 	public Blockchain(int[] balances) {
 		// @ requires array_slice_deep(balances,0,balances.length,Positive,unit,?els,?vls)
 		// @ ensures BlockchainInv(_) &*& isBlock(this.head)
-		this.head = new SummaryBlock(null, 1, balances);
+		this.head = new SummaryBlock(null, 0, balances);
 	}
 
 	/**
