@@ -75,25 +75,25 @@ Francisco Silva, nr 50654
 */
 
 interface Block {
-	// @ predicate BlockInv(Block p, int hp, int h);
+	//@ predicate BlockInv(Block p, int hp, int h);
 
 	static final int MAX_ID = 100;
 
 	int balanceOf(int id);
-	// @ requires BlockInv(?p, ?hp, ?h) &*& ValidID(id) == true;
-	// @ ensures BlockInv(p, hp, h);
+	//@ requires BlockInv(?p, ?hp, ?h) &*& ValidID(id) == true;
+	//@ ensures BlockInv(p, hp, h);
 
 	Block getPrevious();
-	// @ requires BlockInv(?p, ?hp, ?h);
-	// @ ensures BlockInv(p, hp, h) &*& result == p;
+	//@ requires BlockInv(?p, ?hp, ?h);
+	//@ ensures BlockInv(p, hp, h) &*& result == p;
 
 	int getPreviousHash();
-	// @ requires BlockInv(?p, ?hp, ?h);
-	// @ ensures BlockInv(p, hp, h) &*& result == hp;
+	//@ requires BlockInv(?p, ?hp, ?h);
+	//@ ensures BlockInv(p, hp, h) &*& result == hp;
 
 	int hash();
-	// @ requires BlockInv(?p, ?hp, ?h);
-	// @ ensures BlockInv(p, hp, h) &*& result == h;
+	//@ requires BlockInv(?p, ?hp, ?h);
+	//@ ensures BlockInv(p, hp, h) &*& result == h;
 }
 
 /*
@@ -102,16 +102,14 @@ interface Block {
  */
 
 class Blockchain {
-	/*
-	 * @ predicate BlockchainInv(Blockchain b; int[] a) = b.balances |->a &*& a !=
-	 * null &*& array_slice(a, 0, a.length, ?elems);
+	/*@ predicate BlockchainInv(Blockchain b; int[] a) = b.balances |->a 
+	 &*& a != null &*& array_slice(a, 0, a.length, ?elems);
 	 */
 
 	private Block head;
 
-	// @ ensures BlockchainInv(_) &*& isBlock(this.head)
-	// @ requires
-	// array_slice_deep(balances,0,balances.length,Positive,unit,?els,?vls)
+	//@ ensures BlockchainInv(_) &*& isBlock(this.head)
+	//@ requires array_slice_deep(balances,0,balances.length,Positive,unit,?els,?vls)
 	public Blockchain(int[] balances) {
 		this.head = new SummaryBlock(null, 0, balances);
 	}
@@ -122,9 +120,8 @@ class Blockchain {
 	 * 
 	 */
 	public boolean addBlock(Block b)
-	// @ requires BlockchainInv(?h) &*& b.isBlock() &*& b.getPrevious() ==
-	// this.head;
-	// @ ensures BlockchainInv(h);
+	//@ requires BlockchainInv(?h) &*& b.isBlock() &*& b.getPrevious() == this.head;
+	//@ ensures BlockchainInv(h);
 	{
 		boolean valid = isValid(b.hash());
 		if (valid) {
@@ -139,8 +136,8 @@ class Blockchain {
 	 *
 	 */
 	public Block getHead()
-	// @ requires BlockchainInv(?h);
-	// @ ensures BlockchainInv(h) &*& result == this.head;
+	//@ requires BlockchainInv(?h);
+	//@ ensures BlockchainInv(h) &*& result == this.head;
 	{
 		return head;
 	}
@@ -151,8 +148,8 @@ class Blockchain {
 	 * 
 	 */
 	private boolean isValid(int hash)
-	// @ requires BlockchainInv(?h);
-	// @ ensures BlockchainInv(h);
+	//@ requires BlockchainInv(?h);
+	//@ ensures BlockchainInv(h);
 	{
 		if (hash % 100 == 0)
 			return true;
